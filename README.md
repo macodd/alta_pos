@@ -1,6 +1,6 @@
 # alta_pos
 
-A new Flutter project.
+A new Flutter project used in conjunction with zitio.io web page.
 
 ## Getting Started
 

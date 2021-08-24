@@ -1,6 +1,9 @@
+import 'package:alta_pos/components/alert.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:alta_pos/utils/style.dart';
+import 'package:alta_pos/utils/firebase_signin.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -15,8 +18,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   AutovalidateMode _autoValidateMode = AutovalidateMode.disabled;
-
-  // bool _disabled = true;
 
   @override
   void dispose() {
@@ -156,10 +157,26 @@ class _LoginScreenState extends State<LoginScreen> {
           fontSize: 16.0,
           letterSpacing: 1.0),
       ),
-      onPressed: () {
+      onPressed: () async {
         if (_formKey.currentState!.validate()) {
-          FocusScope.of(context).unfocus();
-          Navigator.of(context).pushReplacementNamed('/dashboard');
+          String res = await signIn(_emailController.text, _passwordController.text);
+          print(res);
+          if (res == 'user-not-found') {
+            showAlertDialog(context, 'Wrong email/password.');
+          }
+          else if (res == 'invalid-email') {
+            showAlertDialog(context, 'Wrong email/password.');
+          }
+          else if (res == 'wrong-password') {
+            showAlertDialog(context, 'Wrong email/password.');
+          }
+          else if (res == 'user-signed-in'){
+            FocusScope.of(context).unfocus();
+            Navigator.of(context).pushReplacementNamed('/dashboard');
+          }
+          else {
+            showAlertDialog(context, 'Server is offline.');
+          }
         }
         else {
           setState(() {

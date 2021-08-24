@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'utils/style.dart';
 
 /// Screens
-import 'screens/splash/intro_splash_screen.dart';
+import 'screens/splash/splash_screen.dart';
 import 'screens/login/login_screen.dart';
 import 'screens/reset_password/reset_password_screen.dart';
 import 'screens/home/home_screen.dart';
@@ -14,7 +14,10 @@ import 'screens/cart/cart_screen.dart';
 import 'screens/payment_select/payment_select_screen.dart';
 import 'screens/success/success_screen.dart';
 
-void main() => runApp(AltaApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(AltaApp());
+}
 
 class AltaApp extends StatelessWidget {
   // This widget is the root of your application.
