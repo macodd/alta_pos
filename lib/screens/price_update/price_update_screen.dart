@@ -1,7 +1,7 @@
 import 'package:alta_pos/components/app_bar.dart';
 import 'package:alta_pos/models/cart.dart';
 import 'package:alta_pos/models/product.dart';
-import 'package:alta_pos/utils/order_setup.dart';
+import 'package:alta_pos/utils/global.dart';
 import 'package:alta_pos/utils/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -176,7 +176,7 @@ class _PriceInputScreenState extends State<PriceInputScreen> {
           // add the price of the last item to the list
           CartItem newItem = new CartItem(widget.product.name, widget.product.sku, total);
           // add item to list in order
-          CURRENT_ORDER.getCart().addToCart(newItem.sku, newItem);
+          currentOrder.cart.addToCart(newItem.sku, newItem);
           // push to next page
           FocusScope.of(context).unfocus();
           Navigator.pushNamed(context, '/cart');

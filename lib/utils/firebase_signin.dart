@@ -1,6 +1,7 @@
+import 'package:alta_pos/models/profile.dart';
+import 'package:alta_pos/utils/global.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-FirebaseAuth auth = FirebaseAuth.instance;
 
 Future<String> signIn(String email, String password) async {
   print('signing in..');
@@ -9,7 +10,17 @@ Future<String> signIn(String email, String password) async {
         email: email,
         password: password
     );
+
+    User? user = userCredential.user;
+
+    userProfile = new Profile(
+      user!.displayName ?? "user",
+      user.email ?? "email",
+      user.uid
+    );
+
     return 'user-signed-in';
+
   } on FirebaseAuthException catch (e) {
     if (e.code == 'user-not-found') {
       print('No user found for that email.');

@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'utils/style.dart';
 
 /// Screens
-import 'screens/splash/splash_screen.dart';
+import 'utils/loading.dart';
 import 'screens/login/login_screen.dart';
 import 'screens/reset_password/reset_password_screen.dart';
 import 'screens/home/home_screen.dart';

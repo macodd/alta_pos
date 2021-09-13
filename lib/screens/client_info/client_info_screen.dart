@@ -1,8 +1,7 @@
 import 'package:alta_pos/components/app_bar.dart';
-import 'package:alta_pos/examples/example_objects.dart';
-import 'package:alta_pos/models/client.dart';
+import 'package:alta_pos/models/customer.dart';
 import 'package:alta_pos/screens/client_create/client_create_screen.dart';
-import 'package:alta_pos/utils/order_setup.dart';
+import 'package:alta_pos/utils/global.dart';
 import 'package:alta_pos/utils/style.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +10,7 @@ class ClientInfoPage extends StatelessWidget {
   ClientInfoPage({key, required this.customer}) : super(key: key);
 
   // customer information to show to user
-  final Client customer;
+  final Customer customer;
 
   // General build widget to show information
   Widget customerInfo(label, customerInfo) {
@@ -65,10 +64,9 @@ class ClientInfoPage extends StatelessWidget {
         child: Icon(Icons.arrow_forward, color: Colors.white),
         onPressed: () {
           print('payment type');
-          CURRENT_ORDER.setClient(customer);
-          String fbUid = firebaseGetUid();
-          CURRENT_ORDER.setTransactionId(fbUid);
-          buildLink(USER_PROFILE.getUsername(), fbUid);
+          currentOrder.setCustomer(customer);
+          // call firebase
+          currentOrder.setTransactionId("AX023");
           Navigator.pushNamed(context, '/payment_select');
         }
     );
@@ -86,8 +84,8 @@ class ClientInfoPage extends StatelessWidget {
           customerInfo("First Names", customer.firstNames),
           customerInfo("Last Names", customer.lastNames),
           customerInfo("Email", customer.email),
-          customerInfo("Address", '${customer.address!.street}, ${customer.address!.neighborhood}'),
-          customerInfo("City", '${customer.address!.city}, ${customer.address!.state}'),
+          customerInfo("Address", '${customer.address['street']}, ${customer.address['neighborhood']}'),
+          customerInfo("City", '${customer.address['city']}, ${customer.address['state']}'),
           SizedBox(height: 100),
         ],
       ),

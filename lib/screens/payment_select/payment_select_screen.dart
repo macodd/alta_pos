@@ -1,14 +1,12 @@
 import 'package:alta_pos/utils/style.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:alta_pos/utils/order_setup.dart';
+import 'package:alta_pos/utils/global.dart';
 
 
 class PaymentSelectScreen extends StatefulWidget {
-  
-  final String link = getLink();
-  final double orderTotal = CURRENT_ORDER.getTotal();
 
   @override
   _PaymentSelectScreenState createState() => _PaymentSelectScreenState();
@@ -22,8 +20,11 @@ class _PaymentSelectScreenState extends State<PaymentSelectScreen> {
   double _change = 0.0;
   double _displayAmount = 0.00;
 
+  late String _link;
+
   @override
   void initState() {
+    _link = buildLink();
     super.initState();
   }
 
@@ -80,7 +81,7 @@ class _PaymentSelectScreenState extends State<PaymentSelectScreen> {
         TextButton(
           onPressed: () {
             FocusScope.of(context).unfocus();
-            CURRENT_ORDER.clear();
+            currentOrder.clear();
             Navigator.pushReplacementNamed(context, '/complete');
           },
           child: Text(
@@ -103,7 +104,7 @@ class _PaymentSelectScreenState extends State<PaymentSelectScreen> {
             child: Center(
               child: RepaintBoundary(
                 child: QrImage(
-                  data: widget.link,
+                  data: _link,
                   version: QrVersions.auto,
                   padding: const EdgeInsets.all(10),
                   backgroundColor: Colors.white,
@@ -158,7 +159,7 @@ class _PaymentSelectScreenState extends State<PaymentSelectScreen> {
           ],
           onChanged: (val) {
             int? amount = int.tryParse(val);
-            double total = CURRENT_ORDER.getTotal();
+            double total = currentOrder.total;
             double returnChange = 0.0;
             if (amount != null){
               double tmp = amount/100;
@@ -212,7 +213,7 @@ class _PaymentSelectScreenState extends State<PaymentSelectScreen> {
                 ),
               ),
               Text(
-                CURRENT_ORDER.getTotal().toStringAsFixed(2),
+                currentOrder.total.toStringAsFixed(2),
                 style: TextStyle(
                   fontFamily: "Popins",
                   fontSize: 14

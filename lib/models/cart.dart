@@ -27,7 +27,7 @@ class Cart {
   }
 
   // returns the amount of items in the cart
-  int numOfItems() => _items.length;
+  int get numOfItems => _items.length;
 
   // removes the item at index
   void removeItem(String sku) => _items.remove(sku);

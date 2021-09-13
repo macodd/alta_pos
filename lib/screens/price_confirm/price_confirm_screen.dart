@@ -4,7 +4,7 @@ import 'package:alta_pos/models/product.dart';
 import 'package:alta_pos/screens/price_update/price_update_screen.dart';
 import 'package:alta_pos/utils/style.dart';
 import 'package:flutter/material.dart';
-import 'package:alta_pos/utils/order_setup.dart';
+import 'package:alta_pos/utils/global.dart';
 
 
 class ConfirmPriceScreen extends StatelessWidget {
@@ -61,7 +61,7 @@ class ConfirmPriceScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 90)
         ),
         onPressed: () {
-          CURRENT_ORDER.getCart().addToCart(
+          currentOrder.cart.addToCart(
               product.sku,
               CartItem(product.name, product.sku, product.initialPrice)
           );

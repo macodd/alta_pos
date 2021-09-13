@@ -2,14 +2,14 @@ import 'package:alta_pos/components/app_bar.dart';
 import 'package:alta_pos/screens/client_info/client_info_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:alta_pos/models/client.dart';
+import 'package:alta_pos/models/customer.dart';
 
 
 class ClientCreateScreen extends StatefulWidget {
   ClientCreateScreen({key, required this.title, this.customer}) : super(key: key);
 
   final String title;
-  final Client? customer;
+  final Customer? customer;
 
   @override
   _ClientCreateScreenState createState() => _ClientCreateScreenState();
@@ -33,18 +33,24 @@ class _ClientCreateScreenState extends State<ClientCreateScreen> {
 
   @override
   void initState() {
-    if (widget.customer != null) {
-      _rucController.text = widget.customer!.ruc;
-      _firstNamesController.text = widget.customer!.firstNames;
-      _lastNamesController.text = widget.customer!.lastNames;
-      _emailController.text = widget.customer!.email;
-
-      _cityController.text = widget.customer!.address!.city;
-      _stateController.text = widget.customer!.address!.state;
-      _neighborhoodController.text = widget.customer!.address!.neighborhood;
-      _streetController.text = widget.customer!.address!.street;
-    }
+    setControllersText();
     super.initState();
+  }
+
+  void setControllersText() {
+    if (widget.customer != null) {
+      setState(() {
+        _rucController.text = widget.customer!.ruc;
+        _firstNamesController.text = widget.customer!.firstNames;
+        _lastNamesController.text = widget.customer!.lastNames;
+        _emailController.text = widget.customer!.email;
+
+        _cityController.text = widget.customer!.address['city'] ?? '';
+        _stateController.text = widget.customer!.address['state'] ?? '';
+        _neighborhoodController.text = widget.customer!.address['neighborhood'] ?? '';
+        _streetController.text = widget.customer!.address['street'] ?? '';
+      });
+    }
   }
 
   @override
@@ -138,7 +144,7 @@ class _ClientCreateScreenState extends State<ClientCreateScreen> {
     );
   }
 
-  late Client currentClient;
+  late Customer currentCustomer;
 
   void next() {
     switch (_index) {
@@ -149,12 +155,11 @@ class _ClientCreateScreenState extends State<ClientCreateScreen> {
             _activeAddress = true;
             _infoState = StepState.complete;
 
-            currentClient = new Client(
-                _rucController.text,
-                _firstNamesController.text,
-                _lastNamesController.text,
-                _emailController.text,
-            );
+            currentCustomer.ruc = _rucController.text;
+            currentCustomer.firstNames = _firstNamesController.text;
+            currentCustomer.lastNames = _lastNamesController.text;
+            currentCustomer.email = _emailController.text;
+
           });
           goto(1);
         }
@@ -169,18 +174,19 @@ class _ClientCreateScreenState extends State<ClientCreateScreen> {
           setState(() {
             _addressState = StepState.complete;
 
-            currentClient.setAddress(new Address(
-              _cityController.text,
-              _stateController.text,
-              _neighborhoodController.text,
-              _streetController.text,
-            ));
+            currentCustomer.setAddress({
+              'city': _cityController.text,
+              'state': _stateController.text,
+              'neighborhood': _neighborhoodController.text,
+              'street': _streetController.text,
+            });
+
           });
           FocusScope.of(context).unfocus();
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => ClientInfoPage(customer: currentClient)
+                  builder: (context) => ClientInfoPage(customer: currentCustomer)
               )
           );
         }

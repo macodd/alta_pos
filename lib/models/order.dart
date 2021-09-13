@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'client.dart';
+import 'customer.dart';
 import 'cart.dart';
 
 enum PaymentMethod {QR, Credit_Card, Cash}
@@ -11,7 +11,7 @@ enum PaymentMethod {QR, Credit_Card, Cash}
 /// Stores the customer information and the Cart
 class Order {
   // Customer holder
-  Client? _client;
+  Customer? _customer;
   // Cart holder
   Cart _cart;
   // payment type stored
@@ -22,9 +22,9 @@ class Order {
   bool _addCommission = false;
   bool _transactionFee = false;
 
-  Order(this._client, this._cart, this._paymentType);
+  Order(this._customer, this._cart, this._paymentType);
 
-  Cart getCart() => _cart;
+  Cart get cart => _cart;
 
   /// get it from firebase
   void setTransactionId(String transId) => _transactionId = transId;
@@ -34,15 +34,15 @@ class Order {
   // updates the transaction fee
   void setTransactionFee() => _transactionFee = !_transactionFee;
 
-  bool getTransactionFee() => _transactionFee;
+  bool get transactionFee => _transactionFee;
 
   // updates the commission fee
   void setCommission() => _addCommission = !_addCommission;
 
-  bool getCommission() => _addCommission;
+  bool get commission => _addCommission;
 
   // return the total + 0.50 for transaction cost
-  double getTotal() {
+  double get total {
     double transFee = 0.0;
     double commissionFee = 0.0;
     double total = _cart.getCartTotal();
@@ -62,16 +62,16 @@ class Order {
   PaymentMethod? getPaymentMethod() => _paymentType;
 
   // sets a customer
-  void setClient(Client client) => _client = client;
+  void setCustomer(Customer customer) => _customer = customer;
 
   // returns the customer
-  Client? getClient() => _client;
+  Customer? getCustomer() => _customer;
 
   // clears the current order
   void clear() {
     _addCommission = false;
     _transactionFee = false;
-    _client = null;
+    _customer = null;
     _cart = new Cart(new SplayTreeMap());
     _paymentType = null;
     _transactionId = null;

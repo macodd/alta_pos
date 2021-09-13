@@ -1,11 +1,9 @@
 import 'package:alta_pos/components/app_bar.dart';
-import 'package:alta_pos/examples/example_objects.dart';
-import 'package:alta_pos/models/client.dart';
+import 'package:alta_pos/models/customer.dart';
 import 'package:alta_pos/screens/client_create/client_create_screen.dart';
-
-// models used
 import 'package:alta_pos/screens/client_info/client_info_screen.dart';
 import 'package:alta_pos/utils/style.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -26,7 +24,7 @@ class _ClientSearchScreenState extends State<ClientSearchScreen> {
   // form key
   final GlobalKey<FormState> _searchFormKey = new GlobalKey();
 
-  // widget to show if customer is found
+  // // widget to show if customer is found
   Widget? _showSearchResult;
 
   // used for changing focus after keyboard entry
@@ -36,7 +34,13 @@ class _ClientSearchScreenState extends State<ClientSearchScreen> {
   @override
   void initState() {
     _focusNode = FocusNode();
-    _showSearchResult = Text('');
+    _showSearchResult = Text(
+        'Search using the ruc',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        color: Colors.grey
+      ),
+    );
     super.initState();
   }
 
@@ -105,113 +109,148 @@ class _ClientSearchScreenState extends State<ClientSearchScreen> {
         onPressed: () {
           _focusNode.unfocus();
           if (_searchFormKey.currentState!.validate()) {
-            Client? _customer = searchCustomer(_searchField.text);
-            if (_customer != null) {
-              showFoundClient(_customer);
-            }
-            else {
-              setState(() {
-                _showSearchResult = Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: Text(
-                          "No Customer Found",
-                          style: TextStyle(
-                            fontFamily: "Popins",
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      OutlinedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ClientCreateScreen(title: 'New Account')
-                            )
-                          );
-                        },
-                        child: Text('Add New Client')
-                      )
-                    ]
-                );
-              });
-            }
+            setState(() {
+              _showSearchResult = searchCustomer();
+            });
           }
         }
       );
   }
 
-  /// shows the user if the customer is in the database
-  void showFoundClient(Client _customer) {
-    // widget to store search result
-    setState(() {
-      _showSearchResult = Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text(
-              "Customer Found",
-              style: TextStyle(
-                fontFamily: "Popins",
-                fontSize: 16,
-                fontWeight: FontWeight.bold
-              ),
+  FutureBuilder<DocumentSnapshot> searchCustomer() {
+    CollectionReference customers = FirebaseFirestore.instance.collection('customers');
+    
+    return FutureBuilder<DocumentSnapshot>(
+      future: customers.doc(_searchField.text).get(),
+      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Text("Something went wrong")
+            ]
+          );
+        }
+
+        if (snapshot.hasData && !snapshot.data!.exists) {
+          return showNoCustomerFound();
+        }
+
+        if (snapshot.connectionState == ConnectionState.done) {
+          Customer customer = Customer.fromJson(snapshot.data!.id, snapshot.data!.data());
+          return showFoundCustomer(customer);
+        }
+
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            CircularProgressIndicator(
+              semanticsLabel: "searching..",
+            )
+          ]
+        );
+      },
+    );
+  }
+
+  Widget showNoCustomerFound() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Text(
+            "No Customer Found",
+            style: TextStyle(
+              fontFamily: "Popins",
+              fontSize: 16,
+              fontWeight: FontWeight.bold
             ),
           ),
-          Card(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5)),
-            elevation: 10,
-            color: ColorStyle.fontColorDarkTitle,
-            child: InkWell(
-              onTap: () {
-                print('info page');
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ClientInfoPage(customer: _customer)
-                    )
-                );
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ListTile(
-                    leading: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Icon(Icons.person)),
-                    title: Text(
-                      _customer.firstNames + ' ' + _customer.lastNames,
-                      style: TextStyle(
-                        fontFamily: 'Sans',
-                        fontSize: 12
-                      ),
-                    ),
-                    subtitle: Text(
-                      _customer.ruc,
-                      style: TextStyle(
-                        fontFamily: 'Sans',
-                        fontSize: 12
-                      ),
-                    ),
-                    trailing: Icon(Icons.arrow_forward),
-                  ),
-                ],
-              ),
+        ),
+        SizedBox(height: 20),
+        OutlinedButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ClientCreateScreen(title: 'New Account')
+                )
+            );
+          },
+          child: Text('Add New Client')
+        )
+      ]
+  );
+
+  }
+
+  /// shows the user if the customer is in the database
+  Widget showFoundCustomer(Customer _customer) {
+    // widget to store search result
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Text(
+            "Customer Found",
+            style: TextStyle(
+              fontFamily: "Popins",
+              fontSize: 16,
+              fontWeight: FontWeight.bold
             ),
-          )
-        ],
-      );
-    });
+          ),
+        ),
+        Card(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5)),
+          elevation: 10,
+          color: ColorStyle.fontColorDarkTitle,
+          child: InkWell(
+            onTap: () {
+              print('info page');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ClientInfoPage(customer: _customer)
+                  )
+              );
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ListTile(
+                  leading: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Icon(Icons.person)),
+                  title: Text(
+                    _customer.fullName,
+                    style: TextStyle(
+                      fontFamily: 'Sans',
+                      fontSize: 12
+                    ),
+                  ),
+                  subtitle: Text(
+                    _customer.ruc,
+                    style: TextStyle(
+                      fontFamily: 'Sans',
+                      fontSize: 12
+                    ),
+                  ),
+                  trailing: Icon(Icons.arrow_forward),
+                ),
+              ],
+            ),
+          ),
+        )
+      ],
+    );
   }
 
   @override

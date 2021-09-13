@@ -1,4 +1,4 @@
-import 'package:alta_pos/utils/order_setup.dart';
+import 'package:alta_pos/utils/global.dart';
 import 'package:alta_pos/utils/style.dart';
 import 'package:flutter/material.dart';
 
@@ -20,9 +20,9 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   void initState() {
-    _orderTotal = CURRENT_ORDER.getTotal();
-    _isCommissionSwitched = CURRENT_ORDER.getCommission();
-    _isTransactionFeeSwitched = CURRENT_ORDER.getTransactionFee();
+    _orderTotal = currentOrder.total;
+    _isCommissionSwitched = currentOrder.commission;
+    _isTransactionFeeSwitched = currentOrder.transactionFee;
     super.initState();
   }
 
@@ -51,7 +51,7 @@ class _CartScreenState extends State<CartScreen> {
       actions: [
         TextButton(
           onPressed: () {
-            CURRENT_ORDER.clear();
+            currentOrder.clear();
             Navigator.pushReplacementNamed(context, '/dashboard');
           },
           child: Text(
@@ -76,8 +76,8 @@ class _CartScreenState extends State<CartScreen> {
           onChanged: (val) {
             setState(() {
               _isCommissionSwitched = val;
-              CURRENT_ORDER.setCommission();
-              _orderTotal = CURRENT_ORDER.getTotal();
+              currentOrder.setCommission();
+              _orderTotal = currentOrder.total;
             });
           },
           activeTrackColor: Colors.green,
@@ -97,8 +97,8 @@ class _CartScreenState extends State<CartScreen> {
           onChanged: (val) {
             setState(() {
               _isTransactionFeeSwitched = val;
-              CURRENT_ORDER.setTransactionFee();
-              _orderTotal = CURRENT_ORDER.getTotal();
+              currentOrder.setTransactionFee();
+              _orderTotal = currentOrder.total;
             });
           },
           activeTrackColor: Colors.green,
@@ -109,10 +109,10 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget displayList() {
-    var order = CURRENT_ORDER.getCart();
+    var order = currentOrder.cart;
     return Expanded(
         child: ListView.builder(
-          itemCount: order.numOfItems(),
+          itemCount: order.numOfItems,
           itemBuilder: (context, index) {
             final item = order.getItem(index);
             return Dismissible(
@@ -232,7 +232,7 @@ class _CartScreenState extends State<CartScreen> {
                 ],
               ),
               onPressed: () {
-                if (CURRENT_ORDER.getTotal() < 10) {
+                if (currentOrder.total < 10) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       shape: RoundedRectangleBorder(

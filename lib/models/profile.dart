@@ -7,19 +7,16 @@ class Profile {
   // name and email of user
   String _name;
   String _email;
-  String _username;
   String _uid;
 
-  Profile(this._name, this._email, this._username, this._uid);
+  Profile(this._name, this._email, this._uid);
 
   // get user name
-  String getName() => _name;
+  String get name => this._name;
 
   // get user email
-  String getEmail() => _email;
+  String get email => this._email;
 
-  // get username
-  String getUsername() => _username;
-
-  String getUid() => _uid;
+  //get uid (username)
+  String get uid => this._uid;
 }

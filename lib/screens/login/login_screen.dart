@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:alta_pos/utils/style.dart';
 import 'package:alta_pos/utils/firebase_signin.dart';
+import 'package:alta_pos/utils/email_storage.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -28,7 +29,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
+    getPrefsEmail();
     super.initState();
+  }
+
+  void getPrefsEmail() async {
+    _emailController.text = await getEmail();
   }
 
   Widget loginBanner() {
@@ -160,7 +166,6 @@ class _LoginScreenState extends State<LoginScreen> {
       onPressed: () async {
         if (_formKey.currentState!.validate()) {
           String res = await signIn(_emailController.text, _passwordController.text);
-          print(res);
           if (res == 'user-not-found') {
             showAlertDialog(context, 'Wrong email/password.');
           }
@@ -171,11 +176,13 @@ class _LoginScreenState extends State<LoginScreen> {
             showAlertDialog(context, 'Wrong email/password.');
           }
           else if (res == 'user-signed-in'){
+            saveEmail(_emailController.text);
             FocusScope.of(context).unfocus();
             Navigator.of(context).pushReplacementNamed('/dashboard');
           }
           else {
-            showAlertDialog(context, 'Server is offline.');
+            print(res);
+            showAlertDialog(context, 'Something went wrong.');
           }
         }
         else {
@@ -208,11 +215,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     passwordFormField(),
                     SizedBox(height: 10),
                     forgotPasswordButton(),
-                    SizedBox(height: 20),
-                    loginButton()
                   ],
                 ),
               ),
+            ),
+          ),
+          bottomNavigationBar: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                loginButton()
+              ],
             ),
           ),
         ),

@@ -1,4 +1,4 @@
-import 'package:alta_pos/utils/order_setup.dart';
+import 'package:alta_pos/utils/global.dart';
 import 'package:flutter/material.dart';
 
 
@@ -14,7 +14,7 @@ PreferredSizeWidget generalAppBar(context, String title) {
         onPressed: () {
           FocusScope.of(context).unfocus();
           if (title == 'Products') {
-            CURRENT_ORDER.clear();
+            currentOrder.clear();
             Navigator.pushReplacementNamed(context, '/dashboard');
           }
           else if (title == 'Search') {

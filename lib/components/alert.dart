@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-Future<void> showAlertDialog(context, content) async {
+Future<void> showAlertDialog(BuildContext context, content) async {
   return showDialog<void>(
     context: context,
     barrierDismissible: true, // user must tap button!
-    builder: (BuildContext context) {
+    builder: (BuildContext ctx) {
       return AlertDialog(
         backgroundColor: Colors.white,
         title: const Text(
@@ -17,14 +17,18 @@ Future<void> showAlertDialog(context, content) async {
           ),
         ),
         content: SingleChildScrollView(
-            child: Text(
-              content,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.black,
-                  fontFamily: 'Popins'
-              ),
+            child: ListBody(
+              children: [
+                Text(
+                  content,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.black,
+                      fontFamily: 'Popins'
+                  ),
+                )
+              ],
             )
         ),
         actionsPadding: EdgeInsets.zero,
@@ -42,7 +46,7 @@ Future<void> showAlertDialog(context, content) async {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(ctx).pop();
                 },
               ),
             ],
